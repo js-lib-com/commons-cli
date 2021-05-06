@@ -18,8 +18,8 @@ public class Velocity
   public Velocity(String templateResource)
   {
     this.velocity = new VelocityEngine();
-    this.velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-    this.velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+    this.velocity.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
+    this.velocity.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
     this.velocity.init();
 
     this.context = new VelocityContext();
