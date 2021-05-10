@@ -135,7 +135,7 @@ public class Config
 
   public String getex(String key, String... defaultValue) throws IOException
   {
-    return get(key, String.class, defaultValue);
+    return getex(key, String.class, defaultValue);
   }
 
   public boolean has(String key) throws IOException

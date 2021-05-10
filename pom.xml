@@ -22,21 +22,22 @@
 	</licenses>
 
 	<scm>
-		<connection>https://github.com/js-lib-com/commons.git</connection>
-		<url>https://github.com/js-lib-com/commons</url>
+		<connection>https://github.com/js-lib-com/commons-cli.git</connection>
+		<url>https://github.com/js-lib-com/commons-cli</url>
 	</scm>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.js-lib</groupId>
 			<artifactId>js-commons</artifactId>
-			<version>1.3.0</version>
+			<version>1.3.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.js-lib</groupId>

@@ -36,6 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import js.io.IConsole;
 import js.lang.BugError;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,7 +46,7 @@ public class FilesUtilTest {
 	@Mock
 	private FileSystem fileSystem;
 	@Mock
-	private Console console;
+	private IConsole console;
 
 	private FilesUtil files;
 

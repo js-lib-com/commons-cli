@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.FileSystems;
 
+import js.io.IConsole;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -15,7 +16,7 @@ public abstract class Task implements Runnable {
 	@Option(names = { "-x", "--exception" }, description = "Print stack trace on exception.")
 	private boolean stacktrace;
 
-	protected Console console;
+	protected IConsole console;
 	protected Config config;
 	protected FilesUtil files;
 	protected WebsUtil webs;
@@ -33,7 +34,7 @@ public abstract class Task implements Runnable {
 		this.webs = parent.webs;
 	}
 
-	public void setConsole(Console console) {
+	public void setConsole(IConsole console) {
 		this.console = console;
 	}
 

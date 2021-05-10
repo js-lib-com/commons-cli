@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import js.io.IConsole;
 import js.lang.BugError;
 import js.util.Params;
 import js.util.Strings;
@@ -36,7 +37,7 @@ import js.util.Strings;
 public class FilesUtil
 {
   private final FileSystem fileSystem;
-  private final Console console;
+  private final IConsole console;
 
   public FilesUtil()
   {
@@ -44,7 +45,7 @@ public class FilesUtil
     this.console = null;
   }
 
-  public FilesUtil(FileSystem fileSystem, Console console)
+  public FilesUtil(FileSystem fileSystem, IConsole console)
   {
     this.fileSystem = fileSystem;
     this.console = console;

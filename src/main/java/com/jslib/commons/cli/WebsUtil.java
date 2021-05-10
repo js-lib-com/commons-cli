@@ -30,10 +30,11 @@ import js.dom.Document;
 import js.dom.DocumentBuilder;
 import js.dom.Element;
 import js.format.FileSize;
+import js.io.IConsole;
 import js.util.Classes;
 
 public class WebsUtil {
-	private final Console console;
+	private final IConsole console;
 
 	private HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 	private DocumentBuilder documentBuilder = Classes.loadService(DocumentBuilder.class);
@@ -42,7 +43,7 @@ public class WebsUtil {
 		this.console = null;
 	}
 
-	public WebsUtil(Console console) {
+	public WebsUtil(IConsole console) {
 		this.console = console;
 	}
 
