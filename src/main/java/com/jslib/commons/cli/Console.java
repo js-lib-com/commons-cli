@@ -78,7 +78,7 @@ public class Console implements IConsole
       System.out.printf("[%s]: ", defaultValue[0]);
     }
     String value = reader.readLine();
-    return value.isEmpty() ? defaultValue[0] : value;
+    return value.isEmpty() ? defaultValue.length == 1 ? defaultValue[0] : value : value;
   }
 
   @Override

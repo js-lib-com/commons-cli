@@ -71,6 +71,15 @@ public class FilesUtil
     return file.getFileName().toString();
   }
 
+  public List<String> getFileNames(Path dir) throws IOException
+  {
+    List<String> fileNames = new ArrayList<>();
+    for(Path file : listFiles(dir)) {
+      fileNames.add(getFileBasename(file));
+    }
+    return fileNames;
+  }
+
   public String getFileBasename(Path file)
   {
     String fileName = file.getFileName().toString();
@@ -99,14 +108,8 @@ public class FilesUtil
   public void createDirectory(Path dir) throws IOException
   {
     Params.notNull(dir, "Directory");
-    fileSystem.provider().createDirectory(dir);
-  }
-
-  public void createDirectoryIfNotExists(Path dir) throws IOException
-  {
-    Params.notNull(dir, "Directory");
     if(!exists(dir)) {
-      createDirectory(dir);
+      fileSystem.provider().createDirectory(dir);
     }
   }
 
@@ -237,6 +240,7 @@ public class FilesUtil
 
   public Writer getWriter(Path file) throws IOException
   {
+    createDirectory(file.getParent());
     return new OutputStreamWriter(fileSystem.provider().newOutputStream(file), "UTF-8");
   }
 
@@ -312,7 +316,7 @@ public class FilesUtil
           console.print("Copy file %s", relativeFile);
         }
         Path targetFile = targetDir.resolve(relativeFile);
-        createDirectoryIfNotExists(targetFile.getParent());
+        createDirectory(targetFile.getParent());
         fileSystem.provider().copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
         return FileVisitResult.CONTINUE;
       }

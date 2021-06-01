@@ -9,18 +9,28 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.xml.xpath.XPathExpressionException;
+
+import org.xml.sax.SAXException;
+
 import js.converter.Converter;
 import js.converter.ConverterRegistry;
+import js.dom.Document;
+import js.dom.DocumentBuilder;
+import js.dom.Element;
 import js.lang.BugError;
+import js.util.Classes;
 import js.util.Strings;
 
 public class Config
 {
+  private static final String PROJECT_DESCRIPTOR_FILE = "project.xml";
   private static final String PROJECT_PROPERTIES_FILE = ".project.properties";
 
   private final Converter converter;
@@ -29,7 +39,7 @@ public class Config
   private final Properties projectProperties;
   private final File projectPropertiesFile;
 
-  public Config(Properties globalProperties, Properties projectProperties) throws IOException
+  public Config(Properties globalProperties, Properties projectProperties) throws IOException, SAXException, XPathExpressionException
   {
     this.converter = ConverterRegistry.getConverter();
     this.globalProperties = globalProperties;
@@ -43,17 +53,42 @@ public class Config
       }
     }
 
+    File projectDescriptorFile = new File(workingDir, PROJECT_DESCRIPTOR_FILE);
+    if(projectDescriptorFile.exists()) {
+      injectDescriptorProperties(new FileReader(projectDescriptorFile));
+    }
+
     // all CLI applications have a bin directory and a properties file there
     Path homeDir = Paths.get(Home.getPath());
     Path binDir = homeDir.resolve("bin");
     if(Files.exists(binDir)) {
+      // findFirst returns and Optional the throws exception on get if there is no properties file found
       Path propertiesFile = Files.walk(binDir).filter(path -> path.getFileName().toString().endsWith(".properties")).findFirst().get();
-      if(Files.exists(propertiesFile)) {
-        try (Reader reader = Files.newBufferedReader(propertiesFile)) {
-          globalProperties.load(reader);
-        }
+      try (Reader reader = Files.newBufferedReader(propertiesFile)) {
+        globalProperties.load(reader);
       }
     }
+  }
+
+  public void injectDescriptorProperties(Reader descriptorReader) throws IOException, SAXException, XPathExpressionException
+  {
+    DocumentBuilder builder = Classes.loadService(DocumentBuilder.class);
+    Document doc = builder.loadXML(descriptorReader);
+    for(Element element : doc.findByXPath("//*[normalize-space(text())]")) {
+      String key = key(element);
+      if(!projectProperties.containsKey(key)) {
+        projectProperties.put(key, element.getText());
+      }
+    }
+  }
+
+  private static String key(Element element)
+  {
+    List<String> parts = Strings.split(element.getTag(), '-');
+    if(parts.size() == 1) {
+      parts.add(0, "project");
+    }
+    return Strings.join(parts, '.');
   }
 
   public SortedMap<String, String> getProperties(boolean includeGlobal) throws IOException

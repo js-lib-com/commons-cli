@@ -4,13 +4,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Properties;
+
+import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.xml.sax.SAXException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigTest
@@ -22,7 +27,7 @@ public class ConfigTest
   private Config config;
 
   @Before
-  public void beforeTest() throws IOException
+  public void beforeTest() throws IOException, XPathExpressionException, SAXException
   {
     Home.setPath("D:\\wood-1.0");
     config = new Config(globalProperties, projectProperties);
@@ -85,5 +90,36 @@ public class ConfigTest
 
     // then
     assertThat(globalProperties.get("user.name"), equalTo("Iulian Rotaru"));
+  }
+
+  @Test
+  public void GivenProjectDescriptor_WhenInjectDescriptorProperties_ThenInsertProperties() throws XPathExpressionException, IOException, SAXException
+  {
+    // given
+    projectProperties = new Properties();
+    config = new Config(globalProperties, projectProperties);
+
+    String descriptor = "" + //
+        "<project>" + //
+        "   <name>fables</name>" + //
+        "   <build-dir>target/site</build-dir>" + //
+        "   <exclude-dirs>src</exclude-dirs>" + //
+        "   <display> </display>" + //
+        "   <description></description>" + //
+        "   <head>" + //
+        "       <script src=''></script>" + //
+        "       <script src=''/>" + //
+        "   </head>" + //
+        "</project>";
+    Reader descriptorReader = new StringReader(descriptor);
+
+    // when
+    config.injectDescriptorProperties(descriptorReader);
+
+    // then
+    assertThat(projectProperties.size(), equalTo(3));
+    assertThat(projectProperties.get("project.name"), equalTo("fables"));
+    assertThat(projectProperties.get("build.dir"), equalTo("target/site"));
+    assertThat(projectProperties.get("exclude.dirs"), equalTo("src"));
   }
 }

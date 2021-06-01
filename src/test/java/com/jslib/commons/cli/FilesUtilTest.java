@@ -187,44 +187,32 @@ public class FilesUtilTest {
 		assertThat(extension, equalTo(""));
 	}
 
-	@Test
-	public void createDirectory() throws IOException {
-		// given
-		Path dir = mock(Path.class);
+    @Test
+    public void GivenDirDoesNotExist_WhenCreateDirectory_ThenProviderCreateDirectory() throws IOException {
+        // given
+        Path dir = mock(Path.class);
+        doThrow(IOException.class).when(provider).checkAccess(dir);
 
-		// when
-		files.createDirectory(dir);
+        // when
+        files.createDirectory(dir);
 
-		// then
-		verify(provider, times(1)).createDirectory(dir);
-	}
+        // then
+        verify(provider, times(1)).checkAccess(dir);
+        verify(provider, times(1)).createDirectory(dir);
+    }
 
-	@Test
-	public void createDirectoryIfNotExists() throws IOException {
-		// given
-		Path dir = mock(Path.class);
-		doThrow(IOException.class).when(provider).checkAccess(dir);
+    @Test
+    public void GivenDirDoesExist_WhenCreateDirectory_ThenNotProviderCreateDirectory() throws IOException {
+        // given
+        Path dir = mock(Path.class);
 
-		// when
-		files.createDirectoryIfNotExists(dir);
+        // when
+        files.createDirectory(dir);
 
-		// then
-		verify(provider, times(1)).checkAccess(dir);
-		verify(provider, times(1)).createDirectory(dir);
-	}
-
-	@Test
-	public void createDirectoryIfNotExists_GivenDirectoryExist_ThenDoNotCreate() throws IOException {
-		// given
-		Path dir = mock(Path.class);
-
-		// when
-		files.createDirectoryIfNotExists(dir);
-
-		// then
-		verify(provider, times(1)).checkAccess(dir);
-		verify(provider, times(0)).createDirectory(dir);
-	}
+        // then
+        verify(provider, times(1)).checkAccess(dir);
+        verify(provider, times(0)).createDirectory(dir);
+    }
 
 	@Test
 	public void createDirectories() throws IOException {

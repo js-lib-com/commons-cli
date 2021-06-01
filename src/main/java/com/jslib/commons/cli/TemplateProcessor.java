@@ -10,7 +10,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -21,6 +24,10 @@ import js.util.Strings;
 
 public class TemplateProcessor
 {
+  private static final String TEMPLATE_EXT = ".vtl";
+
+  private final Map<String, String> excludedFiles = new HashMap<>();
+
   private File targetDir;
   private boolean verbose;
 
@@ -34,30 +41,64 @@ public class TemplateProcessor
     this.verbose = verbose;
   }
 
+  public Reader getExcludedFileReader(String fileName)
+  {
+    String content = excludedFiles.get(fileName);
+    return content != null ? new StringReader(content) : null;
+  }
+
   public void exec(String type, String templateName, Map<String, String> variables) throws IOException
   {
     File woodHomeDir = new File(Home.getPath());
     File templateFile = new File(woodHomeDir, Strings.concat("template", File.separatorChar, type, File.separatorChar, templateName, ".zip"));
+    exec(templateFile, variables);
+  }
 
+  public void exec(File templateFile, Map<String, String> variables) throws IOException
+  {
     try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(templateFile)))) {
       ZipEntry zipEntry;
       while((zipEntry = zipInputStream.getNextEntry()) != null) {
-        String zipEntryName = Strings.injectVariables(zipEntry.getName(), variables);
+        Flag flag = new Flag(zipEntry.getName(), variables);
+        String entryName = Strings.injectVariables(flag.entryName, variables);
+        boolean directory = entryName.endsWith("/");
 
-        if(zipEntryName.endsWith("/")) {
-          mkdirs(zipEntryName);
+        String[] zipEntryNameSegments = entryName.split("/");
+        String fileName = zipEntryNameSegments[zipEntryNameSegments.length - 1];
+        boolean template = false;
+        if(fileName.endsWith(TEMPLATE_EXT)) {
+          template = true;
+          fileName = fileName.substring(0, fileName.length() - TEMPLATE_EXT.length());
+          zipEntryNameSegments[zipEntryNameSegments.length - 1] = fileName;
+        }
+
+        // ${page}~{compo-script}.js.vtl
+        // if there is no 'compo-script' variable equal with 'true' then ignores zip entry
+        if(flag.value != null && !"true".equalsIgnoreCase(variables.get(flag.value))) {
+          if(!directory) {
+            StringWriter writer = new StringWriter();
+            if(template) {
+              copy(zipInputStream, Strings.join(zipEntryNameSegments, '/'), writer, variables);
+            }
+            else {
+              copy(zipInputStream, writer);
+            }
+            excludedFiles.put(fileName, writer.toString());
+          }
           continue;
         }
 
-        String[] zipEntryNameSegments = zipEntryName.split("/");
-        String fileName = zipEntryNameSegments[zipEntryNameSegments.length - 1];
+        if(directory) {
+          mkdirs(entryName);
+          continue;
+        }
+
         // by convention, for formatted files, file name has .vtl extension
-        if(fileName.endsWith(".vtl")) {
-          zipEntryNameSegments[zipEntryNameSegments.length - 1] = fileName.substring(0, fileName.length() - 4);
+        if(template) {
           copy(zipInputStream, Strings.join(zipEntryNameSegments, '/'), variables);
         }
         else {
-          copy(zipInputStream, zipEntryName);
+          copy(zipInputStream, entryName);
         }
       }
     }
@@ -80,14 +121,18 @@ public class TemplateProcessor
     if(verbose) {
       print("Create file '%s'.", file);
     }
+    copy(zipInputStream, zipEntryName, new FileWriter(file), variables);
+  }
 
+  private void copy(ZipInputStream zipInputStream, String zipEntryName, Writer writer, Map<String, String> variables) throws IOException
+  {
     VelocityContext context = new VelocityContext();
     for(Map.Entry<String, String> entry : variables.entrySet()) {
       context.put(entry.getKey(), entry.getValue());
     }
 
     Reader reader = new UncloseableReader(new InputStreamReader(zipInputStream));
-    try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+    try (Writer bufferedWriter = new BufferedWriter(writer)) {
       org.apache.velocity.app.Velocity.evaluate(context, writer, zipEntryName, reader);
     }
   }
@@ -104,6 +149,17 @@ public class TemplateProcessor
       int len;
       while((len = zipInputStream.read(buffer)) > 0) {
         fileOutputStream.write(buffer, 0, len);
+      }
+    }
+  }
+
+  private void copy(ZipInputStream zipInputStream, Writer writer) throws IOException
+  {
+    char[] buffer = new char[2048];
+    int len;
+    try (Reader reader = new UncloseableReader(new InputStreamReader(zipInputStream)); Writer bufferedWriter = new BufferedWriter(writer)) {
+      while((len = reader.read(buffer)) > 0) {
+        writer.write(buffer, 0, len);
       }
     }
   }
@@ -133,6 +189,43 @@ public class TemplateProcessor
     @Override
     public void close() throws IOException
     {
+    }
+  }
+
+  private static class Flag
+  {
+    final String entryName;
+    final String value;
+
+    Flag(String entryName, Map<String, String> variables) throws IOException
+    {
+      int start = entryName.indexOf("~{");
+      if(start == -1) {
+        this.entryName = entryName;
+        this.value = null;
+        return;
+      }
+      int end = entryName.indexOf('}', start);
+      if(end == -1) {
+        throw new IOException(Strings.format("Invalid ZIP entery name %s. Missing flag end mark.", entryName));
+      }
+
+      this.value = entryName.substring(start + 2, end);
+
+      StringBuilder stringBuilder = new StringBuilder();
+      for(int i = 0; i < start; ++i) {
+        stringBuilder.append(entryName.charAt(i));
+      }
+      for(int i = end + 1; i < entryName.length(); ++i) {
+        stringBuilder.append(entryName.charAt(i));
+      }
+      this.entryName = stringBuilder.toString();
+    }
+
+    @Override
+    public String toString()
+    {
+      return "Flag [entryName=" + entryName + ", value=" + value + "]";
     }
   }
 }
