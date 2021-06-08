@@ -99,6 +99,16 @@ public class FilesUtil
     return file.toString().endsWith(extension);
   }
 
+  public Path changeExtension(Path file, String extension)
+  {
+    String path = file.toString();
+    int extensionPos = path.lastIndexOf('.');
+    if(extensionPos == -1) {
+      return fileSystem.getPath(Strings.concat(path, '.', extension));
+    }
+    return fileSystem.getPath(path.substring(0, extensionPos + 1) + extension);
+  }
+
   public LocalDateTime getModificationTime(Path file) throws IOException
   {
     FileTime fileTime = fileSystem.provider().readAttributes(file, BasicFileAttributes.class).lastModifiedTime();

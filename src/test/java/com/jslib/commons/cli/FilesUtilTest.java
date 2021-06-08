@@ -158,7 +158,7 @@ public class FilesUtilTest {
 	}
 
 	@Test
-	public void getExtension() {
+	public void GivenFileNameWithExtension_WhenGetExtension_ThenGotIt() {
 		// given
 		Path file = mock(Path.class);
 		Path name = mock(Path.class);
@@ -173,7 +173,7 @@ public class FilesUtilTest {
 	}
 
 	@Test
-	public void getExtension_GivenMissingExtension_ThenReturnEmptyString() {
+	public void GivenFileNameWithoutExtension_WhenGetExtension_ThenEmptyString() {
 		// given
 		Path file = mock(Path.class);
 		Path name = mock(Path.class);
@@ -187,6 +187,40 @@ public class FilesUtilTest {
 		assertThat(extension, equalTo(""));
 	}
 
+    @Test
+    public void GivenFilePathWithExtension_WhenChangeExtension_ThenPathWithNewExtension() {
+      // given
+      Path layoutFile = mock(Path.class);
+      when(layoutFile.toString()).thenReturn("res/compo/dialog.htm");
+      
+      Path scriptFile = mock(Path.class); 
+      when(fileSystem.getPath("res/compo/dialog.js")).thenReturn(scriptFile);
+      when(scriptFile.toString()).thenReturn("res/compo/dialog.js");
+      
+      // when
+      Path resultFile = files.changeExtension(layoutFile, "js");
+      
+      // then
+      assertThat(resultFile.toString(), equalTo("res/compo/dialog.js"));
+    }
+
+    @Test
+    public void GivenFilePathWithoutExtension_WhenChangeExtension_ThenPathWithNewExtension() {
+      // given
+      Path genericFile = mock(Path.class);
+      when(genericFile.toString()).thenReturn("res/compo/dialog");
+      
+      Path scriptFile = mock(Path.class); 
+      when(fileSystem.getPath("res/compo/dialog.js")).thenReturn(scriptFile);
+      when(scriptFile.toString()).thenReturn("res/compo/dialog.js");
+      
+      // when
+      Path resultFile = files.changeExtension(genericFile, "js");
+      
+      // then
+      assertThat(resultFile.toString(), equalTo("res/compo/dialog.js"));
+    }
+	
     @Test
     public void GivenDirDoesNotExist_WhenCreateDirectory_ThenProviderCreateDirectory() throws IOException {
         // given
