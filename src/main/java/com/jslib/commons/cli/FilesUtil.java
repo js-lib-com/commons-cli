@@ -279,16 +279,16 @@ public class FilesUtil
     Files.walkFileTree(start, visitor);
   }
 
+  public void copy(Path sourceFile, Path targetFile) throws IOException
+  {
+    createDirectories(targetFile.getParent());
+    copy(getReader(sourceFile), getWriter(targetFile));
+  }
+
   public void copy(String source, Path targetFile) throws IOException
   {
     createDirectories(targetFile.getParent());
-    try (Reader reader = new StringReader(source); Writer writer = getWriter(targetFile)) {
-      char[] buffer = new char[1024];
-      int length;
-      while((length = reader.read(buffer, 0, buffer.length)) != -1) {
-        writer.write(buffer, 0, length);
-      }
-    }
+    copy(new StringReader(source), getWriter(targetFile));
   }
 
   public void copy(Reader reader, Writer writer) throws IOException
