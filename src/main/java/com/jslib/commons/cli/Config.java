@@ -28,7 +28,7 @@ import js.lang.BugError;
 import js.util.Classes;
 import js.util.Strings;
 
-public class Config
+public class Config implements IConfig
 {
   private static final String PROJECT_DESCRIPTOR_FILE = "project.xml";
   private static final String PROJECT_PROPERTIES_FILE = ".project.properties";
@@ -70,6 +70,7 @@ public class Config
     }
   }
 
+  @Override
   public void injectDescriptorProperties(Reader descriptorReader) throws IOException, SAXException, XPathExpressionException
   {
     DocumentBuilder builder = Classes.loadService(DocumentBuilder.class);
@@ -91,6 +92,7 @@ public class Config
     return Strings.join(parts, '.');
   }
 
+  @Override
   public SortedMap<String, String> getProperties(boolean includeGlobal) throws IOException
   {
     SortedMap<String, String> properties = new TreeMap<>();
@@ -105,16 +107,19 @@ public class Config
     return properties;
   }
 
+  @Override
   public Properties getGlobalProperties() throws IOException
   {
     return globalProperties;
   }
 
+  @Override
   public void updateGlobalProperties(Properties properties) throws IOException
   {
     properties.forEach((key, value) -> globalProperties.merge(key, value, (oldValue, newValue) -> newValue));
   }
 
+  @Override
   public void put(String key, Object value) throws IOException
   {
     if(!projectPropertiesFile.exists()) {
@@ -126,6 +131,7 @@ public class Config
     }
   }
 
+  @Override
   public void remove(String key) throws IOException
   {
     if(!projectPropertiesFile.exists()) {
@@ -137,6 +143,7 @@ public class Config
     }
   }
 
+  @Override
   public <T> T get(String key, Class<T> type, String... defaultValue) throws IOException
   {
     Object value = projectProperties.get(key);
@@ -154,6 +161,7 @@ public class Config
     return converter.asObject(Strings.injectProperties(value.toString()), type);
   }
 
+  @Override
   public <T> T getex(String key, Class<T> type, String... defaultValue) throws IOException
   {
     T value = get(key, type, defaultValue);
@@ -163,16 +171,19 @@ public class Config
     return value;
   }
 
+  @Override
   public String get(String key, String... defaultValue) throws IOException
   {
     return get(key, String.class, defaultValue);
   }
 
+  @Override
   public String getex(String key, String... defaultValue) throws IOException
   {
     return getex(key, String.class, defaultValue);
   }
 
+  @Override
   public boolean has(String key) throws IOException
   {
     Object value = projectProperties.get(key);

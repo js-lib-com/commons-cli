@@ -24,7 +24,7 @@ public class ConfigTest
   @Mock
   private Properties projectProperties;
 
-  private Config config;
+  private IConfig config;
 
   @Before
   public void beforeTest() throws IOException, XPathExpressionException, SAXException
