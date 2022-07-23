@@ -59,11 +59,20 @@ public class Config implements IConfig
     }
 
     // all CLI applications have a bin directory and a properties file there
-    Path homeDir = Paths.get(Home.getPath());
-    Path binDir = homeDir.resolve("bin");
-    if(Files.exists(binDir)) {
-      // findFirst returns and Optional the throws exception on get if there is no properties file found
-      Path propertiesFile = Files.walk(binDir).filter(path -> path.getFileName().toString().endsWith(".properties")).findFirst().get();
+    Path propertiesFile = null;
+    if(Home.getPath() == null) {
+      // TODO: hack
+      propertiesFile = Paths.get("C://Users/DEV/wood.properties");
+    }
+    else {
+      Path homeDir = Paths.get(Home.getPath());
+      Path binDir = homeDir.resolve("bin");
+      if(Files.exists(binDir)) {
+        // findFirst returns and Optional the throws exception on get if there is no properties file found
+        propertiesFile = Files.walk(binDir).filter(path -> path.getFileName().toString().endsWith(".properties")).findFirst().get();
+      }
+    }
+    if(propertiesFile != null) {
       try (Reader reader = Files.newBufferedReader(propertiesFile)) {
         globalProperties.load(reader);
       }
