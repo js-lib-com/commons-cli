@@ -11,7 +11,7 @@ import java.io.Writer;
 
 import org.junit.Test;
 
-import js.util.Files;
+import com.jslib.util.Files;
 
 public class TextReplaceTest {
 	@Test

@@ -20,7 +20,7 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.velocity.VelocityContext;
 
-import js.util.Strings;
+import com.jslib.util.Strings;
 
 public class TemplateProcessor
 {

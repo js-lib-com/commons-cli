@@ -27,10 +27,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.xml.sax.SAXException;
 
-import js.dom.Document;
-import js.dom.DocumentBuilder;
-import js.dom.Element;
-import js.util.Classes;
+import com.jslib.api.dom.Document;
+import com.jslib.api.dom.DocumentBuilder;
+import com.jslib.api.dom.Element;
+import com.jslib.util.Classes;
 
 public class HttpRequest
 {

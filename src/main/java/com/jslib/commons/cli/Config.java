@@ -19,14 +19,14 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.xml.sax.SAXException;
 
-import js.converter.Converter;
-import js.converter.ConverterRegistry;
-import js.dom.Document;
-import js.dom.DocumentBuilder;
-import js.dom.Element;
-import js.lang.BugError;
-import js.util.Classes;
-import js.util.Strings;
+import com.jslib.api.dom.Document;
+import com.jslib.api.dom.DocumentBuilder;
+import com.jslib.api.dom.Element;
+import com.jslib.converter.Converter;
+import com.jslib.converter.ConverterRegistry;
+import com.jslib.lang.BugError;
+import com.jslib.util.Classes;
+import com.jslib.util.Strings;
 
 public class Config implements IConfig
 {

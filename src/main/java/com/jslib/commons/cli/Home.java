@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import js.lang.BugError;
+import com.jslib.lang.BugError;
 
 public class Home
 {

@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import js.lang.BugError;
-import js.util.Params;
-import js.util.Strings;
+import com.jslib.lang.BugError;
+import com.jslib.util.Params;
+import com.jslib.util.Strings;
 
 public class FilesUtil
 {

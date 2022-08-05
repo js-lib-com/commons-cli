@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import js.util.Files;
+import com.jslib.util.Files;
 
 public class TextReplace {
 	private final List<String> excludes = new ArrayList<>();

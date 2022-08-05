@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import js.lang.BugError;
+import com.jslib.lang.BugError;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FilesUtilTest
